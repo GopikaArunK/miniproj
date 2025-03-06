@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRISPR Efficiency Predictor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .form-radio {
+        appearance: none;
+        padding: 0;
+        print-color-adjust: exact;
+        display: inline-block;
+        vertical-align: middle;
+        background-origin: border-box;
+        user-select: none;
+        flex-shrink: 0;
+        height: 1rem;
+        width: 1rem;
+        color: rgb(79 70 229);
+        background-color: #fff;
+        border-color: #6b7280;
+        border-width: 1px;
+        border-radius: 100%;
+      }
+      .form-radio:checked {
+        background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+        border-color: transparent;
+        background-color: currentColor;
+        background-size: 100% 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+      .results-page {
+        display: none;
+      }
+      .results-page.active {
+        display: block;
+      }
+      .form-page.hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <!-- Header -->
+      <header class="bg-white/80 backdrop-blur-sm border-b border-blue-100">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+          <div class="flex items-center space-x-3">
+            <svg class="h-10 w-10 text-indigo-600 animate-pulse" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M18 13l-6 6"/><path d="M6 13l6 6"/></svg>
+            <div>
+              <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+                CRISPR Efficiency Predictor
+              </h1>
+              <p class="text-gray-600 text-sm mt-1">
+                Optimize your gene editing experiments with AI-powered predictions
+              </p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Form Page -->
+      <main id="formPage" class="form-page max-w-3xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        <div class="bg-white/70 backdrop-blur-sm rounded-3xl shadow-xl border border-blue-100">
+          <div class="p-8">
+            <form id="predictionForm" class="space-y-8">
+              <!-- Target Gene Selection -->
+              <div class="group">
+                <label class="flex items-center text-sm font-medium text-gray-700 mb-2 group-hover:text-indigo-600 transition-colors">
+                  <svg class="h-5 w-5 mr-2 group-hover:text-indigo-600 transition-colors" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                  Target Gene
+                </label>
+                <select
+                  name="targetGene"
+                  class="mt-1 block w-full pl-3 pr-10 py-3 text-base border-gray-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm rounded-xl transition-all hover:bg-white"
+                >
+                  <option value="">Select Target Gene</option>
+                  <option value="BRCA1">BRCA1</option>
+                  <option value="TP53">TP53</option>
+                  <option value="EGFR">EGFR</option>
+                  <option value="KRAS">KRAS</option>
+                </select>
+              </div>
+
+              <!-- Species Selection -->
+              <div class="group">
+                <label class="flex items-center text-sm font-medium text-gray-700 mb-2 group-hover:text-indigo-600 transition-colors">
+                  <svg class="h-5 w-5 mr-2 group-hover:text-indigo-600 transition-colors" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6l3 7H6l3-7Z"/><path d="M3 9h18"/><path d="M3 9v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9"/><path d="M12 12v6"/></svg>
+                  Species
+                </label>
+                <select
+                  name="species"
+                  class="mt-1 block w-full pl-3 pr-10 py-3 text-base border-gray-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm rounded-xl transition-all hover:bg-white"
+                >
+                  <option value="">Select Species</option>
+                  <option value="human">Human (Homo sapiens)</option>
+                  <option value="mouse">Mouse (Mus musculus)</option>
+                  <option value="rat">Rat (Rattus norvegicus)</option>
+                  <option value="zebrafish">Zebrafish (Danio rerio)</option>
+                </select>
+              </div>
+
+              <!-- CRISPR Enzyme Selection -->
+              <div class="group">
+                <label class="flex items-center text-sm font-medium text-gray-700 mb-2 group-hover:text-indigo-600 transition-colors">
+                  <svg class="h-5 w-5 mr-2 group-hover:text-indigo-600 transition-colors" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20L18 4"/><path d="M12 20L18 4"/><path d="M9 20l6-16"/></svg>
+                  CRISPR Enzyme
+                </label>
+                <select
+                  name="enzyme"
+                  class="mt-1 block w-full pl-3 pr-10 py-3 text-base border-gray-200 bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent sm:text-sm rounded-xl transition-all hover:bg-white"
+                >
+                  <option value="">Select Enzyme</option>
+                  <option value="spCas9">Streptococcus pyogenes Cas9 (SpCas9)</option>
+                  <option value="saCas9">Staphylococcus aureus Cas9 (SaCas9)</option>
+                  <option value="cpf1">Cas12a (Cpf1)</option>
+                  <option value="cas13">Cas13</option>
+                </select>
+              </div>
+
+              <!-- Modification Type -->
+              <div class="group">
+                <label class="flex items-center text-sm font-medium text-gray-700 mb-2 group-hover:text-indigo-600 transition-colors">
+                  <svg class="h-5 w-5 mr-2 group-hover:text-indigo-600 transition-colors" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                  Modification Type
+                </label>
+                <div class="mt-3 grid grid-cols-2 gap-4">
+                  <label class="relative flex items-center justify-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-indigo-500 transition-colors bg-white/50 backdrop-blur-sm">
+                    <input
+                      type="radio"
+                      name="modificationType"
+                      value="knockout"
+                      checked
+                      class="form-radio h-4 w-4 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span class="ml-2">Knock-out</span>
+                  </label>
+                  <label class="relative flex items-center justify-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:border-indigo-500 transition-colors bg-white/50 backdrop-blur-sm">
+                    <input
+                      type="radio"
+                      name="modificationType"
+                      value="knockin"
+                      class="form-radio h-4 w-4 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span class="ml-2">Knock-in</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="pt-6">
+                <button
+                  type="submit"
+                  class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-base font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all transform hover:scale-[1.02]"
+                >
+                  Predict Efficiency
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+
+      <!-- Results Page -->
+      <div id="resultsPage" class="results-page max-w-5xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        <div class="bg-white/70 backdrop-blur-sm rounded-3xl shadow-xl border border-blue-100 p-8">
+          <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">Prediction Results</h2>
+            <button id="backButton" class="px-4 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-500">
+              ← Back to Form
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Summary Card -->
+            <div class="bg-white/80 rounded-2xl p-6 shadow-sm border border-blue-50">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Summary</h3>
+              <dl class="space-y-3">
+                <div class="flex justify-between">
+                  <dt class="text-gray-600">Target Gene:</dt>
+                  <dd id="resultTargetGene" class="font-medium text-gray-900"></dd>
+                </div>
+                <div class="flex justify-between">
+                  <dt class="text-gray-600">Species:</dt>
+                  <dd id="resultSpecies" class="font-medium text-gray-900"></dd>
+                </div>
+                <div class="flex justify-between">
+                  <dt class="text-gray-600">Enzyme:</dt>
+                  <dd id="resultEnzyme" class="font-medium text-gray-900"></dd>
+                </div>
+                <div class="flex justify-between">
+                  <dt class="text-gray-600">Modification:</dt>
+                  <dd id="resultModification" class="font-medium text-gray-900"></dd>
+                </div>
+              </dl>
+            </div>
+
+            <!-- Efficiency Score -->
+            <div class="bg-white/80 rounded-2xl p-6 shadow-sm border border-blue-50">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Efficiency Score</h3>
+              <div class="flex items-center justify-center h-48">
+                <canvas id="efficiencyChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="md:col-span-2 bg-white/80 rounded-2xl p-6 shadow-sm border border-blue-50">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Recommendations</h3>
+              <div id="recommendations" class="prose prose-indigo">
+                <!-- Recommendations will be inserted here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/src/main.js"></script>
+  </body>
+</html>
